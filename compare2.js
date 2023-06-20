@@ -2,9 +2,14 @@ import fs from "fs-extra";
 import path from "node:path";
 import fg from "fast-glob";
 import chalk from "chalk";
+import runSync from "./runSync.js";
 
-const backup = process.argv[2];
-const origin = process.argv[3];
+/* const backup = process.argv[2];
+const origin = process.argv[3]; */
+
+const [, , arg] = process.argv;
+let backup = "";
+let origin = "";
 
 async function readDirRecursive(dirPath) {
   const patterns = ["**/*.*"];
@@ -144,4 +149,18 @@ const getFiles = async (dir1, dir2) => {
   console.log(rmbkup);
 };
 
-getFiles(backup, origin);
+const startSync = () => {
+  try {
+    const drives = runSync(arg);
+    if (drives === `${arg} is not a valid option`) {
+      return console.error(chalk.red(drives));
+    }
+    backup = drives.backupDrive;
+    origin = drives.originDrive;
+    getFiles(backup, origin);
+  } catch (error) {
+    console.error("Error: ", error.message);
+  }
+};
+
+startSync();

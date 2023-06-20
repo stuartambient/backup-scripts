@@ -2,9 +2,9 @@ import fs from "fs";
 import path from "path";
 
 const rn = async folder => {
-  const newName = folder.replace("Various Artists -", "Various -");
-  const oldpath = path.join("H:/Top/Music", folder);
-  const newpath = path.join("H:/Top/Music", newName);
+  const newName = folder.replace("Nurse With Wound", "Nurse with Wound");
+  const oldpath = path.join("D:/G_music", folder);
+  const newpath = path.join("D:/G_music", newName);
   const op = await fs.promises.rename(oldpath, newpath);
 };
 
@@ -15,7 +15,7 @@ const startProc = async folders => {
 };
 
 const foldersToChange = folders => {
-  const toChange = folders.filter(f => f.includes("Various Artists -"));
+  const toChange = folders.filter(f => f.includes("Nurse With Wound"));
   return toChange;
 };
 
@@ -26,4 +26,4 @@ const getFolders = async path => {
     .then(res => startProc(res));
 };
 
-getFolders("H:/Top/Music");
+getFolders("D:/G_music");
