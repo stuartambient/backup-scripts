@@ -11,6 +11,23 @@ const [, , arg] = process.argv;
 let backup = "";
 let origin = "";
 
+async function deleteEmptyDirs(directoryPath) {
+  const files = await fs.promises.readdir(directoryPath);
+
+  if (files.length === 0) {
+    await fs.promises.rmdir(directoryPath);
+    return;
+  }
+
+  for (const file of files) {
+    const filePath = path.join(directoryPath, file);
+    const stats = await fs.promises.stat(filePath);
+    if (stats.isDirectory()) {
+      await deleteEmptyDirs(filePath);
+    }
+  }
+}
+
 async function readDirRecursive(dirPath) {
   const patterns = ["**/*.*"];
   const options = {
@@ -20,6 +37,7 @@ async function readDirRecursive(dirPath) {
     dot: true,
   };
   const filePaths = await fg(patterns, options);
+  await deleteEmptyDirs(dirPath);
   return filePaths;
 }
 
@@ -50,6 +68,7 @@ async function backupFile(source, backupDir) {
     return true;
   } catch (error) {
     console.error(`Error backed up file: ${sourcePath} to ${backupPath}`);
+    console.error("Error messsage: ", error.message);
     return error;
   }
 }
@@ -109,8 +128,22 @@ async function procBackup(arr) {
   return operation;
 }
 
-const getFilteredFiles = (d1, d2) => {
-  return d2.filter(o => !d1.includes(o));
+const filterFiles = async (type, d1, d2) => {
+  const arr = [];
+  for await (const f of d2) {
+    if (type === "bu" && d1.includes(f)) {
+      const fSize1 = await fs.promises.stat(`${backup}/${f}`);
+      const fSize2 = await fs.promises.stat(`${origin}/${f}`);
+      if (fSize1.size < fSize2.size) {
+        console.log(f);
+        arr.push(f);
+      }
+    }
+    if (!d1.includes(f)) {
+      arr.push(f);
+    }
+  }
+  return arr;
 };
 
 const removeRoot = files => {
@@ -122,6 +155,7 @@ const removeRoot = files => {
 };
 
 const getFilesInDir = async dir => {
+  console.log("dir: ", dir);
   return await readDirRecursive(dir);
 };
 
@@ -131,8 +165,8 @@ const getFiles = async (dir1, dir2) => {
   const da = removeRoot(d1);
   const db = removeRoot(d2);
 
-  const notOnBackupDrive = getFilteredFiles(da, db);
-  const removeFromBackup = getFilteredFiles(db, da);
+  const notOnBackupDrive = await filterFiles("bu", da, db);
+  const removeFromBackup = await filterFiles("rm", db, da);
   console.log(chalk.yellow.bold("backup length: "), chalk.yellow(da.length));
   console.log(chalk.green.bold("origin length: "), chalk.green(db.length));
   console.log(
