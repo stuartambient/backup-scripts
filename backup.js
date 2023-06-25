@@ -4,9 +4,6 @@ import fg from "fast-glob";
 import chalk from "chalk";
 import runSync from "./runSync.js";
 
-/* const backup = process.argv[2];
-const origin = process.argv[3]; */
-
 const [, , arg] = process.argv;
 let backup = "";
 let origin = "";
@@ -102,6 +99,9 @@ async function remBackup(arr) {
     } catch (error) {
       /* console.error(`Error processing directory ${a}: ${error}`); */
       removal.errors.push(`${path.join(backup, a)} -- ${error}`);
+    } finally {
+      const tmp = path.join(backup, a);
+      await deleteEmptyDirs(tmp.slice(0, tmp.lastIndexOf("\\")));
     }
     /* console.log(path.join(backup, a)); */
   }
@@ -109,7 +109,7 @@ async function remBackup(arr) {
 }
 
 async function procBackup(arr) {
-  const operation = { resolved: 0, jobsLength: arr.length, failed: 0 };
+  const operation = { resolved: [], jobsLength: arr.length, failed: [] };
 
   for await (const a of arr) {
     let tmp = await checkDirectoryExists(path.dirname(`${backup}/${a}`));
@@ -118,11 +118,10 @@ async function procBackup(arr) {
     try {
       const buFile = await backupFile(`${origin}/${a}`, `${backup}/${a}`);
       if (buFile) {
-        operation.resolved += 1;
+        operation.resolved.push(`${backup}/${a}`);
       }
     } catch (error) {
-      console.error(`Error processing directory ${a}: ${error}`);
-      operation.failed += 1;
+      operation.failed.push(`${error.msg} - ${origin}/${a}`);
     }
   }
   return operation;
@@ -155,11 +154,15 @@ const removeRoot = files => {
 };
 
 const getFilesInDir = async dir => {
-  console.log("dir: ", dir);
   return await readDirRecursive(dir);
 };
 
+const displayResults = (type, obj) => {
+  console.log(type, obj);
+};
+
 const getFiles = async (dir1, dir2) => {
+  const log = console.log;
   const d1 = await getFilesInDir(dir1);
   const d2 = await getFilesInDir(dir2);
   const da = removeRoot(d1);
@@ -167,8 +170,25 @@ const getFiles = async (dir1, dir2) => {
 
   const notOnBackupDrive = await filterFiles("bu", da, db);
   const removeFromBackup = await filterFiles("rm", db, da);
-  console.log(chalk.yellow.bold("backup length: "), chalk.yellow(da.length));
-  console.log(chalk.green.bold("origin length: "), chalk.green(db.length));
+  log(
+    chalk.yellow.bold("On backup drive: "),
+    chalk.yellow(da.length),
+    "         ",
+    chalk.green.bold("On origin drive: "),
+    chalk.green(db.length)
+  );
+  if (!notOnBackupDrive.length && !removeFromBackup.length) {
+    console.log("");
+    return log(chalk.rgb(15, 100, 204).inverse("No pending jobs"));
+  }
+  await procBackup(notOnBackupDrive).then(results =>
+    displayResults("backed-up", results)
+  );
+  await remBackup(removeFromBackup).then(results =>
+    displayResults("removed", results)
+  );
+
+  /*
   console.log(
     chalk.red.bold("to be backed up: "),
     chalk.red(notOnBackupDrive.length)
@@ -177,10 +197,18 @@ const getFiles = async (dir1, dir2) => {
     chalk.blue.bold("to be removed from backup: "),
     chalk.blue(removeFromBackup.length)
   );
-  const backupFiles = await procBackup(notOnBackupDrive);
-  console.log("result: ", backupFiles);
-  const rmbkup = await remBackup(removeFromBackup);
-  console.log(rmbkup);
+
+  console.log(`Backup results for ${jobsLength} files :`);
+  if (resolved.length) {
+    console.log("Successes: ");
+    resolved.forEach(r => console.log(r));
+  }
+  if (failed.length) {
+    console.log("Failure: ");
+    console.log(failed.forEach(f => console.log(f)));
+  }
+
+  console.log(rmbkup); */
 };
 
 const startSync = () => {
