@@ -4,7 +4,7 @@ const syncs = {
   J: ["G:/S_Music_Backup", "J:/S_Music"],
   D: ["E:/D_Music_Backup", "D:/music"],
   I: ["G:/I_Music_Backup", "I:/Music"],
-  H: ["G:/H_Music_Backup", "H:/Top/Music"],
+  H: ["G:/H_Music_Backup", "H:/Music"],
   E: ["G:/E_Music_Backup", "E:/music"],
 };
 
