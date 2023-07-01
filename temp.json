@@ -1,0 +1,149 @@
+
+child stdout:
+{
+    "format": {
+        "filename": "J:\\test\\02 - eileithyia ii - copy.mp3",
+        "nb_streams": 2,
+        "nb_programs": 0,
+        "format_name": "mp3",
+        "format_long_name": "MP2/3 (MPEG audio layer 2/3)",
+        "start_time": "0.025056",
+        "duration": "1857.410612",
+        "size": "59461444",
+        "bit_rate": "256104",
+        "probe_score": 51,
+        "tags": {
+            "album": "Eileithyia",
+            "artist": "TBC (2)",
+            "TMED": "CDr (Numbered)",
+            "publisher": "Antiinformation",
+            "title": "Untitled",
+            "track": "2",
+            "COUNTRY": "Germany",
+            "DISCOGS_RELEASE_ID": "708980",
+            "CATALOGNUMBER": "AICdisc005",
+            "STYLE": "Abstract, Experimental",
+            "date": "2004"
+        }
+    }
+child stderr:
+Input #0, mp3, from 'J:\test\02 - eileithyia ii - copy.mp3':
+  Metadata:
+    album           : Eileithyia
+    artist          : TBC (2)
+    TMED            : CDr (Numbered)
+    publisher       : Antiinformation
+    title           : Untitled
+    track           : 2
+    COUNTRY         : Germany
+    DISCOGS_RELEASE_ID: 708980
+    CATALOGNUMBER   : AICdisc005
+    STYLE           : Abstract, Experimental
+    date            : 2004
+  Duration: 00:30:57.41, start: 0.025056, bitrate: 256 kb/s
+  Stream #0:0: Audio: mp3, 44100 Hz, stereo, fltp, 256 kb/s
+    Metadata:
+      encoder         : LAME3.96
+    Side data:
+      replaygain: track gain - -4.000000, track peak - unknown, album gain - unknown, album peak - unknown,
+  Stream #0:1: Video: mjpeg (Baseline), yuvj444p(pc, bt470bg/unknown/unknown), 201x198, 90k tbr, 90k tbn (attached pic)
+    Metadata:
+      comment         : Cover (front)
+
+child stdout:
+{
+    "format": {
+        "filename": "J:\\test\\01 - eileithyia i - copy.mp3",
+        "nb_streams": 2,
+        "nb_programs": 0,
+        "format_name": "mp3",
+        "format_long_name": "MP2/3 (MPEG audio layer 2/3)",
+        "start_time": "0.025056",
+        "duration": "1866.736327",
+        "size": "59759867",
+        "bit_rate": "256104",
+        "probe_score": 51,
+        "tags": {
+            "album": "Eileithyia",
+            "artist": "TBC (2)",
+            "TMED": "CDr (Numbered)",
+            "publisher": "Antiinformation",
+            "title": "Untitled",
+            "track": "1",
+            "COUNTRY": "Germany",
+            "DISCOGS_RELEASE_ID": "708980",
+            "CATALOGNUMBER": "AICdisc005",
+            "STYLE": "Abstract, Experimental",
+            "date": "2004"
+        }
+    }
+}
+
+child stderr:
+Input #0, mp3, from 'J:\test\01 - eileithyia i - copy.mp3':
+  Metadata:
+    album           : Eileithyia
+    artist          : TBC (2)
+    TMED            : CDr (Numbered)
+    publisher       : Antiinformation
+    title           : Untitled
+    track           : 1
+    COUNTRY         : Germany
+    DISCOGS_RELEASE_ID: 708980
+    CATALOGNUMBER   : AICdisc005
+    STYLE           : Abstract, Experimental
+    date            : 2004
+  Duration: 00:31:06.74, start: 0.025056, bitrate: 256 kb/s
+  Stream #0:0: Audio: mp3, 44100 Hz, stereo, fltp, 256 kb/s
+    Metadata:
+      encoder         : LAME3.96
+    Side data:
+      replaygain: track gain - -2.200000, track peak - unknown, album gain - unknown, album peak - unknown,
+  Stream #0:1: Video: mjpeg (Baseline), yuvj444p(pc, bt470bg/unknown/unknown), 201x198, 90k tbr, 90k tbn (attached pic)
+    Metadata:
+      comment         : Cover (front)
+
+child stdout:
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
