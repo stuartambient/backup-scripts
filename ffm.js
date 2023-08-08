@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import fs, { copy } from "fs-extra";
 import path from "path";
 import fg from "fast-glob";
-import { File, Tag } from "node-taglib-sharp";
+import { File, Tag, Picture } from "node-taglib-sharp";
 
 /* The result of executing the spawn function 
 is a ChildProcess instance, which implements the EventEmitter API. */
@@ -88,21 +88,43 @@ const writeMeta = async (file, dir) => {
 
 const tagger = (file, dir) => {
   const myFile = File.createFromPath(file);
+  const title = path.basename(file);
+  try {
+    /*   if (!myFile.tag.title) {
+      myFile.tag.title = path.basename(file);
+    } */
 
-  /*   console.log("isPossiblyCorrupt: ", myFile.isPossiblyCorrupt);
-  console.log("isWritable: ", myFile.isWritable);
-  console.log("properties: ", myFile.properties);
-  console.log("tag: ", myFile.tag); */
-  /* console.log("tagTypes: ", myFile.tagTypes); */
-  console.log(myFile.tag.album);
-  myFile.tag.album = "Some Electronic Music";
-  myFile.save();
-  myFile.dispose();
+    /*   if (myFile.tag.title) {
+      console.log(file, myFile.tag.title);
+    } */
+
+    /*     const flac = myFile.getTag(TagTypes.FLAC, true);
+    console.log(flac); */
+
+    /* console.log(myFile.properties); */
+    /* console.log(myFile.tag.isEmpty); */
+    /* console.log(myFile.tag);
+    console.log("----------------"); */
+
+    if (!myFile.tag.title) {
+      myFile.tag.title = title;
+    }
+
+    /*  console.log(myFile.isPossiblyCorrupt, myFile.position, myFile.isWritable); */
+    myFile.tag.picture = Picture.fromPath("./pic.jpg");
+    myFile.save();
+    myFile.dispose();
+  } catch (err) {
+    myFile.removeTags;
+    console.error(err.message, file);
+    myFile.save();
+    myFile.dispose();
+  }
 };
 
 const readDir = async () => {
   const dir = "J:/test";
-  const files = await fg(`J:/test/**/*.*`);
+  const files = await fg(`J:/test/**/*.{mp3,flac,ape,m4a,ogg}`);
   const revisit = [];
   for await (const file of files) {
     const directory = file.slice(0, file.lastIndexOf("/"));

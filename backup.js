@@ -134,7 +134,6 @@ const filterFiles = async (type, d1, d2) => {
       const fSize1 = await fs.promises.stat(`${backup}/${f}`);
       const fSize2 = await fs.promises.stat(`${origin}/${f}`);
       if (fSize1.size < fSize2.size) {
-        console.log(f);
         arr.push(f);
       }
     }
