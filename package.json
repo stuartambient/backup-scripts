@@ -16,6 +16,6 @@
     "fast-glob": "^3.2.12",
     "fs-extra": "^11.1.1",
     "jsmediatags": "^3.9.7",
-    "node-taglib-sharp": "^5.1.0"
+    "node-taglib-sharp": "^5.2.1-fixid3v2nonstandardframes.1"
   }
 }

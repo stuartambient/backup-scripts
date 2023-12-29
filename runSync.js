@@ -1,9 +1,9 @@
 const syncs = {
   G: ["G:/G_Music_Backup", "D:/G_Music"],
   F: ["G:/F_Music_Backup", "F:/Music"],
-  J: ["G:/S_Music_Backup", "J:/S_Music"],
+  /* J: ["G:/S_Music_Backup", "J:/S_Music"], */
   D: ["E:/D_Music_Backup", "D:/music"],
-  I: ["G:/I_Music_Backup", "I:/Music"],
+  /* I: ["G:/I_Music_Backup", "I:/Music"], */
   H: ["G:/H_Music_Backup", "H:/Music"],
   E: ["G:/E_Music_Backup", "E:/music"],
 };

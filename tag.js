@@ -8,6 +8,7 @@ import {
   Picture,
   TagTypes,
   Genres,
+  Id3v1Tag,
   Id3v2Tag,
   Id3v2Frame,
   Id3v2FrameHeader,
@@ -21,33 +22,47 @@ import {
 
 import { default as MpegAudioFileSettings } from "node-taglib-sharp/dist/mpeg/mpegAudioFileSettings.js";
 
+function millisecondsToMinutesAndSeconds(milliseconds) {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return { minutes, seconds };
+}
+
 const tagger = (file, dir) => {
-  const myFile = File.createFromPath(file);
+  try {
+    const myFile = File.createFromPath(file);
+    console.log("file: ", file);
+    /* console.log("tagtypes: ", myFile.tagTypes); */
 
-  const tags = [
-    year,
-    track,
-    disk,
-    title,
-    artist,
-    artists,
-    albumartist,
-    album,
-    data,
-    genre,
-    picture,
-  ];
-
-  /*  for (const t of tags) {
-    t
-  } */
-
-  myFile.save();
-  myFile.dispose();
+    console.log("artist: ", myFile.tag.performers);
+    myFile.tag.performers = ["Test 123"];
+    /* console.log("albums-artists:", myFile.tag.fields); */
+    /*     console.log("bitrate: ", myFile.properties.audioBitrate);
+    console.log("sample-rate: ", myFile.properties.audioSampleRate);
+    console.log(
+      "duration: ",
+      millisecondsToMinutesAndSeconds(myFile.properties.durationMilliseconds)
+    ); */
+    /* 
+    const mediaType = myFile.properties.mediaTypes;
+    if (mediaType === 1) {
+      console.log("media-type: ", "lossy");
+    } else if (mediaType === 17) {
+      console.log("media-type: ", "lossless");
+    }
+    console.log("description: ", myFile.properties.description); */
+    myFile.save();
+    /* myFile.dispose(); */
+  } catch (error) {
+    return;
+  }
 };
 
 const readDir = async () => {
-  const dir = "J:/test";
+  const dir = "F:/music";
+  // const files = await fg(`J:/test/**/*.{mp3,flac,ape,m4a,ogg}`);
   const files = await fg(`J:/test/**/*.{mp3,flac,ape,m4a,ogg}`);
   const revisit = [];
   for await (const file of files) {
