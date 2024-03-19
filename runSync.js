@@ -5,7 +5,7 @@ const syncs = {
   D: ["E:/D_Music_Backup", "D:/music"],
   /* I: ["G:/I_Music_Backup", "I:/Music"], */
   H: ["G:/H_Music_Backup", "H:/Music"],
-  E: ["G:/E_Music_Backup", "E:/music"],
+  I: ["E:/I_Music_Backup", "I:/music"],
 };
 
 const runSync = dir => {
