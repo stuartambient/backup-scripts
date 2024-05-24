@@ -1,26 +1,35 @@
+import { stat } from "node:fs/promises";
 import fs, { copy } from "fs-extra";
 import path from "path";
 import fg from "fast-glob";
+import ffmpeg from "fluent-ffmpeg";
+import writeFile from "./writeFile.js";
 
-import {
-  File,
-  Tag,
-  Picture,
-  TagTypes,
-  Genres,
-  Id3v1Tag,
-  Id3v2Tag,
-  Id3v2Frame,
-  Id3v2FrameHeader,
-  Id3v2FrameIdentifier,
-  Id3v2FrameIdentifiers,
-  Id3v2Settings,
-  Id3v2TextInformationFrame,
-  Id3v2FrameClassType,
-  MpegAudioFile,
-} from "node-taglib-sharp";
+import { File, Tag, Picture, TagTypes, Genres } from "node-taglib-sharp";
 
-import { default as MpegAudioFileSettings } from "node-taglib-sharp/dist/mpeg/mpegAudioFileSettings.js";
+/* console.log("tag types: ", TagTypes); */
+
+function processFile(filePath) {
+  return new Promise((resolve, reject) => {
+    const fileDir = path.dirname(filePath);
+    const fileExt = path.extname(filePath);
+    const fileName = path.basename(filePath, fileExt);
+    const copyFilePath = path.join(fileDir, `${fileName}_copy${fileExt}`);
+
+    ffmpeg(filePath)
+      .audioCodec("flac")
+      .output(copyFilePath)
+      .on("end", () => {
+        console.log(`Created copy: ${copyFilePath}`);
+        resolve();
+      })
+      .on("error", err => {
+        console.error("error: ", err.message);
+        fs.unlink(copyFilePath, () => reject(err));
+      })
+      .run();
+  });
+}
 
 function millisecondsToMinutesAndSeconds(milliseconds) {
   const totalSeconds = Math.floor(milliseconds / 1000);
@@ -30,40 +39,51 @@ function millisecondsToMinutesAndSeconds(milliseconds) {
   return { minutes, seconds };
 }
 
-const tagger = (file, dir) => {
-  try {
-    const myFile = File.createFromPath(file);
-    console.log("file: ", file);
-    /* console.log("tagtypes: ", myFile.tagTypes); */
+const getTagName = value => TagTypes[value.toString()] || "Unknown";
 
-    console.log("artist: ", myFile.tag.performers);
-    myFile.tag.performers = ["Test 123"];
-    /* console.log("albums-artists:", myFile.tag.fields); */
-    /*     console.log("bitrate: ", myFile.properties.audioBitrate);
-    console.log("sample-rate: ", myFile.properties.audioSampleRate);
-    console.log(
-      "duration: ",
-      millisecondsToMinutesAndSeconds(myFile.properties.durationMilliseconds)
-    ); */
-    /* 
-    const mediaType = myFile.properties.mediaTypes;
-    if (mediaType === 1) {
-      console.log("media-type: ", "lossy");
-    } else if (mediaType === 17) {
-      console.log("media-type: ", "lossless");
-    }
-    console.log("description: ", myFile.properties.description); */
-    myFile.save();
-    /* myFile.dispose(); */
+const getTagValue = name => TagTypes[name] || -1;
+
+const tagger = async (file, dir) => {
+  /*   const filestat = await stat(file);
+  console.log(filestat); */
+  try {
+    /* processFile(file); */
+    /* ffmpeg.ffprobe(file, (err, metadata) => {
+      if (err) {
+        console.error("Error getting file info:", err);
+        return;
+      }
+      console.log("File Metadata:", metadata);
+      console.log("-----------------------");
+    }); */
+    const myFile = File.createFromPath(file);
+    console.log(myFile.tag.title, "-----", myFile.properties.codecs);
+    /* console.log(myFile.properties); */
+    //console.log(myFile.corruptionReasons());
+    /*     console.log(path.parse(file).root); */
+    /*     const data = {
+      file,
+
+      codecs: myFile.properties.description,
+      artist: myFile.tag.performers,
+      album: myFile.tag.album,
+      genres: myFile.tag.genres,
+    };
+    writeFile(data);
+    myFile.dispose(); */
   } catch (error) {
-    return;
+    console.error(error.message);
+    processFile(file);
   }
 };
 
 const readDir = async () => {
-  const dir = "F:/music";
+  const dir = "H:/Music/Azumi Nishizawa - Debussy Hommage";
   // const files = await fg(`J:/test/**/*.{mp3,flac,ape,m4a,ogg}`);
-  const files = await fg(`J:/test/**/*.{mp3,flac,ape,m4a,ogg}`);
+  const files = await fg(
+    `H:/Music/Azumi Nishizawa - Debussy Hommage/**/*.{mp3,flac,ape,m4a,ogg}`
+  );
+
   const revisit = [];
   for await (const file of files) {
     const directory = file.slice(0, file.lastIndexOf("/"));

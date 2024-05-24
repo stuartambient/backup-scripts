@@ -1,0 +1,5 @@
+const roots = ["I:/Music", "H:/Music", "F:/Music", "D:/G_MUSIC", "D:/music"];
+
+const f1 = `F:/Music/'T Geruis - Vast/01 - Kobalt.flac`;
+const f2 = `D:/music/The Residents - Music to Eat Bricks By (2019)/1-08 - Grand Larceny.FLAC`;
+const f3 = `H:/Music/Crass - Best Before [1984 ]/(20) Do They Owe Us A Living- (live).FLAC`;
