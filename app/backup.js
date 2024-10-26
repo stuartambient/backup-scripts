@@ -225,3 +225,5 @@ const startSync = () => {
 };
 
 startSync();
+
+/* node backup G && node backup F && node backup D && node backup H && node backup I */
