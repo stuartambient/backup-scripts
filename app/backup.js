@@ -4,6 +4,23 @@ import fg from "fast-glob";
 import chalk from "chalk";
 import runSync from "./runSync.js";
 
+/*
+-startSync sends backupDrive, origindrive to getFiles()
+-getFiles has D1 and D2 to getFilesInDir()
+-getFilesInDir is a function for readDirRecursive(
+-readDirRecursive uses FG)
+-if readDirRecursive finds empty directories (no files) will delete the directory
+-otherwise it will return an array of all relevant files
+
+- So now we have an array for origin files and backup drive files
+- Next getFiles send both arrays to removeRoot() which removes the root folder from each file string
+
+-now getFiles() sends both twice to filterFiles(), first as 'notOnBackupdrive', second as 'removeFromBackup'
+
+
+
+*/
+
 const [, , arg] = process.argv;
 let backup = "";
 let origin = "";
@@ -26,6 +43,7 @@ async function deleteEmptyDirs(directoryPath) {
 }
 
 async function readDirRecursive(dirPath) {
+  //console.log(dirPath);
   const patterns = ["**/*.*"];
   const options = {
     cwd: dirPath,
@@ -35,6 +53,7 @@ async function readDirRecursive(dirPath) {
   };
   const filePaths = await fg(patterns, options);
   await deleteEmptyDirs(dirPath);
+  //console.log("filePaths: ", filePaths);
   return filePaths;
 }
 
@@ -128,19 +147,31 @@ async function procBackup(arr) {
 }
 
 const filterFiles = async (type, d1, d2) => {
+  /* const notOnBackupDrive = await filterFiles("bu", backupNoRoot, originNoRoot);
+  const removeFromBackup = await filterFiles("rm", originNoRoot, backupNoRoot); */
   const arr = [];
   for await (const f of d2) {
+    // follwoing if backup includes the origin file get the stat.
     if (type === "bu" && d1.includes(f)) {
       const fSize1 = await fs.promises.stat(`${backup}/${f}`);
       const fSize2 = await fs.promises.stat(`${origin}/${f}`);
-      if (fSize1.size < fSize2.size) {
+      // backup file size is less than origin file size
+      // it'll need to be backup
+
+      if (fSize1.size > fSize2.size) {
+        arr.push(f);
+      }
+      if (fSize2.mtimeMs > fSize1.mtimeMs) {
         arr.push(f);
       }
     }
-    if (!d1.includes(f)) {
+    // if files is not on its associated drive, file is pushed to array
+
+    if (!d1.includes(f) && !f.endsWith("desktop.ini")) {
       arr.push(f);
     }
   }
+  console.log("arr: ", arr);
   return arr;
 };
 
@@ -160,21 +191,21 @@ const displayResults = (type, obj) => {
   console.log(type, obj);
 };
 
-const getFiles = async (dir1, dir2) => {
+const getFiles = async (backup, origin) => {
   const log = console.log;
-  const d1 = await getFilesInDir(dir1);
-  const d2 = await getFilesInDir(dir2);
-  const da = removeRoot(d1);
-  const db = removeRoot(d2);
+  const backupFiles = await getFilesInDir(backup);
+  const originFiles = await getFilesInDir(origin);
+  const backupNoRoot = removeRoot(backupFiles);
+  const originNoRoot = removeRoot(originFiles);
 
-  const notOnBackupDrive = await filterFiles("bu", da, db);
-  const removeFromBackup = await filterFiles("rm", db, da);
+  const notOnBackupDrive = await filterFiles("bu", backupNoRoot, originNoRoot);
+  const removeFromBackup = await filterFiles("rm", originNoRoot, backupNoRoot);
   log(
     chalk.yellow.bold("On backup drive: "),
-    chalk.yellow(da.length),
+    chalk.yellow(backupNoRoot.length),
     "         ",
     chalk.green.bold("On origin drive: "),
-    chalk.green(db.length)
+    chalk.green(originNoRoot.length)
   );
   if (!notOnBackupDrive.length && !removeFromBackup.length) {
     console.log("");
