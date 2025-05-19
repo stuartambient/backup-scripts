@@ -71,6 +71,7 @@ async function copyFile(sourcePath, destPath) {
 }
 
 async function backupFile(source, backupDir) {
+  const log = console.log;
   const filenameBU = path.basename(backupDir);
   const dirnameBU = path.dirname(backupDir);
   const filenameSO = path.basename(source);
@@ -83,8 +84,7 @@ async function backupFile(source, backupDir) {
     await copyFile(sourcePath, backupPath);
     return true;
   } catch (error) {
-    console.error(`Error backed up file: ${sourcePath} to ${backupPath}`);
-    console.error("Error messsage: ", error.message);
+    log(chalk.red(` ${sourcePath} to ${backupPath} - ${error.message}`));
     return error;
   }
 }
@@ -152,7 +152,7 @@ const filterFiles = async (type, d1, d2) => {
   const arr = [];
   for await (const f of d2) {
     // follwoing if backup includes the origin file get the stat.
-    if (type === "bu" && d1.includes(f)) {
+    if (type === "bu" && d1.includes(f) && !f.endsWith("desktop.ini")) {
       const fSize1 = await fs.promises.stat(`${backup}/${f}`);
       const fSize2 = await fs.promises.stat(`${origin}/${f}`);
       // backup file size is less than origin file size
@@ -167,11 +167,11 @@ const filterFiles = async (type, d1, d2) => {
     }
     // if files is not on its associated drive, file is pushed to array
 
-    if (!d1.includes(f) && !f.endsWith("desktop.ini")) {
+    if (!d1.includes(f)) {
       arr.push(f);
     }
   }
-  console.log("arr: ", arr);
+  /*   console.log("type: ", type, "arr: ", arr); */
   return arr;
 };
 
@@ -188,7 +188,18 @@ const getFilesInDir = async dir => {
 };
 
 const displayResults = (type, obj) => {
-  console.log(type, obj);
+  if (type === "backed-up") {
+    console.log("backed up: ");
+    obj.resolved.forEach(res => {
+      console.log(res);
+    });
+    //
+  } else if (type === "removed") {
+    console.log("removed: ");
+    obj.removed.forEach(rem => {
+      console.log(rem);
+    });
+  }
 };
 
 const getFiles = async (backup, origin) => {
@@ -208,8 +219,7 @@ const getFiles = async (backup, origin) => {
     chalk.green(originNoRoot.length)
   );
   if (!notOnBackupDrive.length && !removeFromBackup.length) {
-    console.log("");
-    return log(chalk.rgb(15, 100, 204).inverse("No pending jobs"));
+    return log(chalk.yellow("No pending jobs"));
   }
   await procBackup(notOnBackupDrive).then(results =>
     displayResults("backed-up", results)
