@@ -3,5 +3,5 @@ assets
 dist
 out
 *.log*
-db
+*.db
 .env
